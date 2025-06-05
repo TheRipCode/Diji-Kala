@@ -1087,6 +1087,32 @@
         .twofa-input.visible {
             display: block;
         }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Country flag */
+        .flag {
+            width: 24px;
+            height: 16px;
+            display: inline-block;
+            margin-left: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -1218,8 +1244,8 @@
                 
                 <div class="vpn-warning" id="iranWarning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Unsafe Connection Detected!</h3>
-                    <p>We've detected that you're connecting from Iran without a VPN. Please use a reliable VPN service and try again.</p>
+                    <h3 id="warningTitle">Unsafe Connection Detected!</h3>
+                    <p id="warningText">We've detected that you're connecting from Iran without a VPN. Please use a reliable VPN service and try again.</p>
                     <button class="main-btn" style="margin-top: 20px;" id="recheckBtn">
                         Recheck Connection <i class="fas fa-redo"></i>
                     </button>
@@ -1233,7 +1259,7 @@
                     <div class="ip-info">
                         <h3><i class="fas fa-info-circle"></i> Connection Information</h3>
                         <p><strong>IP Address:</strong> <span id="ip">192.168.1.1</span></p>
-                        <p><strong>Country:</strong> <span id="country">United States</span></p>
+                        <p><strong>Country:</strong> <span id="country">United States</span> <span id="flag" class="flag"></span></p>
                         <p><strong>Region:</strong> <span id="region">New York</span></p>
                         <p><strong>City:</strong> <span id="city">New York</span></p>
                         <p><strong>ISP:</strong> <span id="isp">Google Cloud</span></p>
@@ -1246,7 +1272,7 @@
                 </div>
                 
                 <div id="vpnChecking">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <div class="spinner"></div>
                     <h3>Checking Your Connection...</h3>
                     <p>Detecting location and VPN status...</p>
                 </div>
@@ -1515,8 +1541,8 @@
                 document.querySelectorAll('.step-card h3')[3].textContent = 'Receive Gems';
                 document.querySelectorAll('.step-card p')[3].textContent = 'Get your free gems delivered to your account within 72 hours. Enjoy your enhanced gaming!';
                 
-                document.querySelector('#iranWarning h3').textContent = 'Unsafe Connection Detected!';
-                document.querySelector('#iranWarning p').textContent = "We've detected that you're connecting from Iran without a VPN. Please use a reliable VPN service and try again.";
+                document.getElementById('warningTitle').textContent = 'Unsafe Connection Detected!';
+                document.getElementById('warningText').textContent = "We've detected that you're connecting from Iran without a VPN. Please use a reliable VPN service and try again.";
                 document.querySelector('#recheckBtn').innerHTML = 'Recheck Connection <i class="fas fa-redo"></i>';
                 document.querySelector('#vpnSuccess h3').textContent = 'Secure Connection!';
                 document.querySelector('#vpnSuccess p').textContent = "You're securely connected via VPN. You may proceed.";
@@ -1607,8 +1633,8 @@
                 document.querySelectorAll('.step-card h3')[3].textContent = 'دریافت جم';
                 document.querySelectorAll('.step-card p')[3].textContent = 'جم های رایگان خود را حداکثر تا 72 ساعت در حساب خود دریافت کنید. از بازی ارتقا یافته لذت ببرید!';
                 
-                document.querySelector('#iranWarning h3').textContent = 'اتصال ناامن شناسایی شد!';
-                document.querySelector('#iranWarning p').textContent = 'ما تشخیص داده‌ایم که شما بدون استفاده از VPN از ایران متصل شده‌اید. لطفاً از یک سرویس VPN معتبر استفاده کنید و دوباره تلاش کنید.';
+                document.getElementById('warningTitle').textContent = 'اتصال ناامن شناسایی شد!';
+                document.getElementById('warningText').textContent = 'ما تشخیص داده‌ایم که شما بدون استفاده از VPN از ایران متصل شده‌اید. لطفاً از یک سرویس VPN معتبر استفاده کنید و دوباره تلاش کنید.';
                 document.querySelector('#recheckBtn').innerHTML = 'بررسی مجدد اتصال <i class="fas fa-redo"></i>';
                 document.querySelector('#vpnSuccess h3').textContent = 'اتصال امن!';
                 document.querySelector('#vpnSuccess p').textContent = 'شما به صورت امن از طریق VPN متصل هستید. می‌توانید ادامه دهید.';
@@ -1720,7 +1746,12 @@
             document.getElementById('vpnSuccess').style.display = 'none';
             
             fetch('https://ipapi.co/json/')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     setTimeout(() => {
                         document.getElementById('vpnChecking').style.display = 'none';
@@ -1732,6 +1763,15 @@
                         document.getElementById('city').textContent = data.city || 'Unknown';
                         document.getElementById('isp').textContent = data.org || 'Unknown';
                         
+                        // Set country flag
+                        const flagElement = document.getElementById('flag');
+                        if (data.country_code) {
+                            flagElement.style.backgroundImage = `url(https://flagcdn.com/24x18/${data.country_code.toLowerCase()}.png)`;
+                            flagElement.style.backgroundSize = 'cover';
+                        } else {
+                            flagElement.style.display = 'none';
+                        }
+                        
                         // Check if user is in Iran
                         if (data.country_code === 'IR') {
                             document.getElementById('vpnStatus').textContent = 'Inactive';
@@ -1742,14 +1782,16 @@
                             document.getElementById('vpnStatus').style.color = '#2EC4B6';
                             document.getElementById('vpnSuccess').style.display = 'block';
                         }
-                    }, 2000);
+                    }, 1500);
                 })
                 .catch(error => {
                     // Fallback if API fails
                     setTimeout(() => {
                         document.getElementById('vpnChecking').style.display = 'none';
-                        document.getElementById('vpnSuccess').style.display = 'block';
-                    }, 2000);
+                        document.getElementById('iranWarning').style.display = 'block';
+                        document.getElementById('warningTitle').textContent = 'Connection Error';
+                        document.getElementById('warningText').textContent = 'Failed to check your connection status. Please try again.';
+                    }, 1500);
                 });
         }
         
