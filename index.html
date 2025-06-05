@@ -47,6 +47,7 @@
             color: var(--text-dark);
         }
 
+        /* Enhanced background with geometric pattern */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -56,6 +57,11 @@
             z-index: -1;
             opacity: 0.3;
             overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 159, 28, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(46, 196, 182, 0.05) 0%, transparent 30%);
+            background-size: 300px 300px;
         }
 
         .bg-particle {
@@ -70,6 +76,7 @@
             100% { transform: translateY(-100vh) translateX(100vw) rotate(360deg); }
         }
 
+        /* Professional header with animated logo */
         header {
             background: rgba(10, 17, 40, 0.95);
             padding: 20px 40px;
@@ -81,6 +88,7 @@
             z-index: 100;
             backdrop-filter: blur(10px);
             animation: slideDown 0.8s ease;
+            border-bottom: 2px solid var(--primary);
         }
 
         @keyframes slideDown {
@@ -103,7 +111,13 @@
         .logo i {
             font-size: 2.8rem;
             color: var(--primary);
-            animation: pulse 2s infinite;
+            animation: pulse 2s infinite, floatLogo 6s infinite ease-in-out;
+        }
+
+        @keyframes floatLogo {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
         }
 
         @keyframes pulse {
@@ -121,6 +135,7 @@
             background-clip: text;
             color: transparent;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .header-controls {
@@ -233,12 +248,19 @@
             background-clip: text;
             color: transparent;
             text-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            animation: textGlow 2s infinite alternate;
+            animation: textGlow 3s infinite alternate;
+            display: inline-block;
+            transition: transform 0.5s ease;
+        }
+
+        .hero h2:hover {
+            transform: perspective(500px) rotateY(10deg);
         }
 
         @keyframes textGlow {
-            0% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            0% { text-shadow: 0 0 10px rgba(255, 159, 28, 0.7); }
+            50% { text-shadow: 0 0 20px rgba(255, 159, 28, 1); }
+            100% { text-shadow: 0 0 10px rgba(255, 159, 28, 0.7); }
         }
 
         .hero p {
@@ -273,6 +295,25 @@
             backdrop-filter: blur(10px);
             transform: translateY(0);
             animation: floatCard 6s infinite ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.1;
         }
 
         @keyframes floatCard {
@@ -378,6 +419,25 @@
             transition: var(--transition);
             transform: perspective(1000px) rotateY(0deg);
             animation: cardAppear 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .step-card:hover::after {
+            transform: scaleX(1);
         }
 
         @keyframes cardAppear {
@@ -450,22 +510,34 @@
             padding: 25px;
             margin: 30px 0;
             text-align: center;
-            animation: pulseWarning 2s infinite;
+            animation: pulseWarningIntense 2s infinite;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transform: scale(1);
+            transition: transform 0.3s ease;
         }
 
-        @keyframes pulseWarning {
-            0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(229, 62, 62, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+        .vpn-warning:hover {
+            transform: scale(1.02);
+        }
+
+        @keyframes pulseWarningIntense {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(229, 62, 62, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
         }
 
         .vpn-warning i {
             font-size: 3rem;
             color: var(--accent);
             margin-bottom: 20px;
+            animation: shake 0.5s infinite alternate;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(10px); }
         }
 
         .ip-info {
@@ -474,6 +546,18 @@
             padding: 20px;
             margin: 20px 0;
             text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ip-info::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--secondary);
         }
 
         .ip-info h3 {
@@ -508,6 +592,25 @@
             border: 2px solid transparent;
             transform: scale(1);
             animation: scaleIn 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-type::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .account-type:hover::before {
+            opacity: 0.1;
         }
 
         @keyframes scaleIn {
@@ -638,10 +741,12 @@
             cursor: pointer;
             box-shadow: 0 0 15px rgba(255, 159, 28, 0.8);
             transition: var(--transition);
+            border: 2px solid white;
         }
 
         .slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
+            box-shadow: 0 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
         .verification-box {
@@ -731,7 +836,12 @@
             font-size: 6rem;
             color: var(--secondary);
             margin-bottom: 30px;
-            animation: pulse 2s infinite, float 6s infinite ease-in-out;
+            animation: pulse 2s infinite, float 6s infinite ease-in-out, rotate 10s infinite linear;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .timer {
@@ -973,7 +1083,7 @@
             color: var(--primary);
         }
         
-        /* New styles for additional sections */
+        /* Notice for Iranian Users */
         .notice-box {
             background: rgba(255, 215, 0, 0.15);
             border: 2px solid var(--gold);
@@ -983,6 +1093,19 @@
             max-width: 800px;
             text-align: center;
             animation: pulseNotice 3s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notice-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,215,0,0.1), transparent);
+            z-index: -1;
         }
         
         @keyframes pulseNotice {
@@ -995,6 +1118,7 @@
             font-size: 2rem;
             color: var(--gold);
             margin-bottom: 15px;
+            animation: pulse 2s infinite;
         }
         
         .why-choose {
@@ -1017,6 +1141,25 @@
             transition: var(--transition);
             transform: perspective(1000px) rotateY(0deg);
             animation: cardAppear 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--secondary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .feature-card:hover::after {
+            transform: scaleX(1);
         }
         
         body.light-mode .feature-card {
@@ -1033,6 +1176,11 @@
             font-size: 3.5rem;
             margin-bottom: 20px;
             color: var(--secondary);
+            transition: transform 0.5s ease;
+        }
+        
+        .feature-card:hover i {
+            transform: scale(1.2);
         }
         
         .feature-card h3 {
@@ -1112,6 +1260,12 @@
             margin-left: 10px;
             border: 1px solid rgba(255,255,255,0.2);
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Particle animation */
+        @keyframes particle {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100vw) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
@@ -1244,8 +1398,8 @@
                 
                 <div class="vpn-warning" id="iranWarning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <h3 id="warningTitle">Unsafe Connection Detected!</h3>
-                    <p id="warningText">We've detected that you're connecting from Iran without a VPN. Please use a reliable VPN service and try again.</p>
+                    <h3 id="warningTitle">Access Restricted for Iranian Users!</h3>
+                    <p id="warningText">Our service requires a VPN for users connecting from Iran. Please enable a reliable VPN service to continue.</p>
                     <button class="main-btn" style="margin-top: 20px;" id="recheckBtn">
                         Recheck Connection <i class="fas fa-redo"></i>
                     </button>
@@ -1541,8 +1695,8 @@
                 document.querySelectorAll('.step-card h3')[3].textContent = 'Receive Gems';
                 document.querySelectorAll('.step-card p')[3].textContent = 'Get your free gems delivered to your account within 72 hours. Enjoy your enhanced gaming!';
                 
-                document.getElementById('warningTitle').textContent = 'Unsafe Connection Detected!';
-                document.getElementById('warningText').textContent = "We've detected that you're connecting from Iran without a VPN. Please use a reliable VPN service and try again.";
+                document.getElementById('warningTitle').textContent = 'Access Restricted for Iranian Users!';
+                document.getElementById('warningText').textContent = "Our service requires a VPN for users connecting from Iran. Please enable a reliable VPN service to continue.";
                 document.querySelector('#recheckBtn').innerHTML = 'Recheck Connection <i class="fas fa-redo"></i>';
                 document.querySelector('#vpnSuccess h3').textContent = 'Secure Connection!';
                 document.querySelector('#vpnSuccess p').textContent = "You're securely connected via VPN. You may proceed.";
@@ -1633,8 +1787,8 @@
                 document.querySelectorAll('.step-card h3')[3].textContent = 'دریافت جم';
                 document.querySelectorAll('.step-card p')[3].textContent = 'جم های رایگان خود را حداکثر تا 72 ساعت در حساب خود دریافت کنید. از بازی ارتقا یافته لذت ببرید!';
                 
-                document.getElementById('warningTitle').textContent = 'اتصال ناامن شناسایی شد!';
-                document.getElementById('warningText').textContent = 'ما تشخیص داده‌ایم که شما بدون استفاده از VPN از ایران متصل شده‌اید. لطفاً از یک سرویس VPN معتبر استفاده کنید و دوباره تلاش کنید.';
+                document.getElementById('warningTitle').textContent = 'دسترسی کاربران ایرانی محدود شده است!';
+                document.getElementById('warningText').textContent = 'سرویس ما برای کاربران متصل از ایران نیاز به استفاده از فیلترشکن (VPN) دارد. لطفاً برای ادامه از یک سرویس فیلترشکن معتبر استفاده کنید.';
                 document.querySelector('#recheckBtn').innerHTML = 'بررسی مجدد اتصال <i class="fas fa-redo"></i>';
                 document.querySelector('#vpnSuccess h3').textContent = 'اتصال امن!';
                 document.querySelector('#vpnSuccess p').textContent = 'شما به صورت امن از طریق VPN متصل هستید. می‌توانید ادامه دهید.';
@@ -2061,4 +2215,4 @@
         updateLanguage();
     </script>
 </body>
-    </html>
+</html>
