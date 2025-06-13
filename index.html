@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Battle Adventure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 2px solid #4ecca3;
+            margin-bottom: 25px;
+            animation: glow 2s infinite alternate;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #4ecca3, #f8f1f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(30, 40, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(78, 204, 163, 0.3);
+        }
+        
+        .currency {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .energy {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .energy-bar {
+            width: 100px;
+            height: 15px;
+            background: #232931;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .energy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecca3, #2ecc71);
+            width: 75%;
+            border-radius: 10px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .menu {
+            background: rgba(35, 41, 49, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .menu-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item:hover {
+            background: rgba(78, 204, 163, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .menu-item.active {
+            background: rgba(78, 204, 163, 0.3);
+            box-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
+        }
+        
+        .content-area {
+            background: rgba(35, 41, 49, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #4ecca3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #4ecca3;
+            padding-bottom: 10px;
+        }
+        
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .character-card {
+            background: rgba(50, 60, 80, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-5px);
+            border-color: #4ecca3;
+            box-shadow: 0 5px 15px rgba(78, 204, 163, 0.4);
+        }
+        
+        .character-card.selected {
+            border-color: #4ecca3;
+            background: rgba(78, 204, 163, 0.15);
+        }
+        
+        .character-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .character-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f8f1f1;
+        }
+        
+        .character-desc {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            margin-bottom: 15px;
+        }
+        
+        .battle-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .combatant {
+            text-align: center;
+            width: 40%;
+            background: rgba(40, 50, 70, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .combatant.player {
+            border: 3px solid #4ecca3;
+        }
+        
+        .combatant.enemy {
+            border: 3px solid #e74c3c;
+        }
+        
+        .combatant-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .hp-bar {
+            width: 100%;
+            height: 25px;
+            background: #232931;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .hp-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.5s ease;
+        }
+        
+        .player .hp-fill {
+            background: linear-gradient(90deg, #4ecca3, #2ecc71);
+        }
+        
+        .enemy .hp-fill {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+        
+        .hp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 3px black;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            background: rgba(78, 204, 163, 0.3);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+        
+        .action-btn:hover {
+            background: rgba(78, 204, 163, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        .action-btn.special {
+            background: rgba(231, 76, 60, 0.3);
+        }
+        
+        .action-btn.special:hover {
+            background: rgba(231, 76, 60, 0.5);
+        }
+        
+        .battle-log {
+            background: rgba(20, 25, 35, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 30px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .player-log {
+            background: rgba(78, 204, 163, 0.2);
+            border-left: 3px solid #4ecca3;
+        }
+        
+        .enemy-log {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 3px solid #e74c3c;
+        }
+        
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .shop-item {
+            background: rgba(50, 60, 80, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .shop-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(78, 204, 163, 0.4);
+        }
+        
+        .item-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #f9ca24;
+        }
+        
+        .upgrade-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .upgrade-card {
+            background: rgba(50, 60, 80, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .progress-container {
+            height: 20px;
+            background: #232931;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecca3, #2ecc71);
+            border-radius: 10px;
+        }
+        
+        .profile-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .profile-info {
+            flex: 1;
+            background: rgba(40, 50, 70, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(30, 40, 60, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .leaderboard {
+            margin-top: 20px;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #4ecca3;
+            gap: 15px;
+        }
+        
+        .leaderboard-rank {
+            font-weight: bold;
+            font-size: 1.2rem;
+            width: 30px;
+            text-align: center;
+            color: #f9ca24;
+        }
+        
+        .fog-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(130, 130, 180, 0.1);
+            backdrop-filter: blur(5px);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            animation: fogPulse 4s infinite;
+        }
+        
+        .fog-title {
+            font-size: 3rem;
+            color: #9b59b6;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(155, 89, 182, 0.7);
+        }
+        
+        .fog-desc {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(78, 204, 163, 0.5); }
+            to { box-shadow: 0 0 20px rgba(78, 204, 163, 0.8); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fogPulse {
+            0% { background: rgba(130, 130, 180, 0.1); }
+            50% { background: rgba(150, 150, 200, 0.2); }
+            100% { background: rgba(130, 130, 180, 0.1); }
+        }
+        
+        .random-event {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(40, 50, 70, 0.95);
+            border: 3px solid #f9ca24;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 100;
+            text-align: center;
+            max-width: 500px;
+            animation: popIn 0.5s ease;
+        }
+        
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .event-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #f9ca24;
+        }
+        
+        .event-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #f9ca24;
+        }
+        
+        .event-desc {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .event-reward {
+            font-size: 1.3rem;
+            color: #2ecc71;
+            margin-top: 15px;
+        }
+        
+        .close-event {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: rgba(78, 204, 163, 0.3);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .mission-card {
+            background: rgba(50, 60, 80, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .mission-timer {
+            background: rgba(231, 76, 60, 0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .mission-progress {
+            height: 10px;
+            background: #232931;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .mission-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecca3, #2ecc71);
+            border-radius: 5px;
+            width: 40%;
+        }
+        
+        .mission-reward {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="fog-overlay" id="fogEvent">
+        <h1 class="fog-title">🌫️ Foggy Week Event 🌫️</h1>
+        <p class="fog-desc">Welcome to the mystical foggy week! Legendary items are available at discounted prices, but beware - the fog brings both fortune and misfortune.</p>
+        <div style="font-size: 2rem; margin: 20px 0;">
+            ⚔️ 🛡️ 🧪 💎 🏆
+        </div>
+        <p>Special offers available only during this limited time event!</p>
+    </div>
+    
+    <div class="random-event" id="randomEvent" style="display: none;">
+        <div class="event-icon" id="eventEmoji">💼</div>
+        <h2 class="event-title" id="eventTitle">Event Title</h2>
+        <p class="event-desc" id="eventDesc">Event description goes here</p>
+        <div class="event-reward" id="eventReward">+100 Coins</div>
+        <button class="close-event" onclick="closeEvent()">Continue</button>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-dragon"></i>
+                <h1>RPG Battle Adventure</h1>
+            </div>
+            <div class="user-info">
+                <div class="currency">
+                    <i class="fas fa-coins" style="color: #f9ca24;"></i>
+                    <span id="coins">1250</span>
+                </div>
+                <div class="currency">
+                    <i class="fas fa-gem" style="color: #2ecc71;"></i>
+                    <span id="diamonds">35</span>
+                </div>
+                <div class="energy">
+                    <i class="fas fa-bolt" style="color: #4ecca3;"></i>
+                    <div class="energy-bar">
+                        <div class="energy-fill"></div>
+                    </div>
+                    <span>6/8</span>
+                </div>
+                <div class="currency">
+                    <i class="fas fa-user" style="color: #3498db;"></i>
+                    <span>Lvl 7</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="menu">
+                <div class="menu-item active" data-section="story">
+                    <i class="fas fa-book"></i> Story Battle
+                </div>
+                <div class="menu-item" data-section="pvp">
+                    <i class="fas fa-users"></i> Battle with Users
+                </div>
+                <div class="menu-item" data-section="friends">
+                    <i class="fas fa-handshake"></i> Battle with Friends
+                </div>
+                <div class="menu-item" data-section="shop">
+                    <i class="fas fa-shopping-cart"></i> Shop
+                </div>
+                <div class="menu-item" data-section="guide">
+                    <i class="fas fa-info-circle"></i> Guide
+                </div>
+                <div class="menu-item" data-section="upgrades">
+                    <i class="fas fa-level-up-alt"></i> Upgrades
+                </div>
+                <div class="menu-item" data-section="profile">
+                    <i class="fas fa-id-card"></i> Profile
+                </div>
+                <div class="menu-item" data-section="leaderboard">
+                    <i class="fas fa-trophy"></i> Leaderboard
+                </div>
+                <div class="menu-item" data-section="rewards">
+                    <i class="fas fa-gift"></i> Rewards & Missions
+                </div>
+            </div>
+            
+            <div class="content-area" id="contentArea">
+                <!-- Story Battle Content -->
+                <div id="storyContent" class="content-section">
+                    <h2 class="section-title"><i class="fas fa-book-open"></i> Story Battle</h2>
+                    <p>Embark on an epic journey through 150 stages of thrilling battles!</p>
+                    
+                    <div class="battle-container">
+                        <div class="combatant player">
+                            <div class="combatant-icon">🧙‍♂️</div>
+                            <h3>Player</h3>
+                            <div class="hp-bar">
+                                <div class="hp-fill" style="width: 80%"></div>
+                                <div class="hp-text">80/100</div>
+                            </div>
+                            <div class="actions">
+                                <button class="action-btn">Fireball 🔥</button>
+                                <button class="action-btn">Ice Shard ❄️</button>
+                                <button class="action-btn">Heal ❤️</button>
+                                <button class="action-btn special">Lightning ⚡</button>
+                            </div>
+                        </div>
+                        
+                        <div class="combatant enemy">
+                            <div class="combatant-icon">🐉</div>
+                            <h3>Forest Dragon</h3>
+                            <div class="hp-bar">
+                                <div class="hp-fill" style="width: 83%"></div>
+                                <div class="hp-text">100/120</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="battle-log">
+                        <div class="log-entry player-log">You used Fireball 🔥! Enemy took 15 damage.</div>
+                        <div class="log-entry enemy-log">Enemy used Tail Whip! You took 10 damage.</div>
+                        <div class="log-entry player-log">You used Heal ❤️! Restored 10 HP.</div>
+                        <div class="log-entry enemy-log">Enemy used Bite! You took 12 damage.</div>
+                        <div class="log-entry player-log">You used Ice Shard ❄️! Enemy took 8 damage.</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-btn" style="width: 200px;">Next Battle</button>
+                    </div>
+                </div>
+                
+                <!-- Character Selection Content -->
+                <div id="charactersContent" class="content-section">
+                    <h2 class="section-title"><i class="fas fa-users"></i> Select Your Hero</h2>
+                    <p>Choose your champion to begin your adventure!</p>
+                    
+                    <div class="characters-grid">
+                        <div class="character-card selected">
+                            <div class="character-icon">🧙‍♂️</div>
+                            <h3 class="character-name">Arcane Mage</h3>
+                            <p class="character-desc">Master of elemental magic with powerful ranged attacks.</p>
+                            <div><strong>Special:</strong> Lightning Storm ⚡</div>
+                            <div><strong>Defense:</strong> Magic Barrier ✨</div>
+                        </div>
+                        
+                        <div class="character-card">
+                            <div class="character-icon">⚔️</div>
+                            <h3 class="character-name">Knight</h3>
+                            <p class="character-desc">Heavily armored warrior with strong melee attacks.</p>
+                            <div><strong>Special:</strong> Whirlwind Slash 🌪️</div>
+                            <div><strong>Defense:</strong> Shield Block 🛡️</div>
+                        </div>
+                        
+                        <div class="character-card">
+                            <div class="character-icon">🏹</div>
+                            <h3 class="character-name">Ranger</h3>
+                            <p class="character-desc">Agile archer with precision strikes and traps.</p>
+                            <div><strong>Special:</strong> Multi-shot 🎯</div>
+                            <div><strong>Defense:</strong> Dodge Roll 🤸</div>
+                        </div>
+                        
+                        <div class="character-card">
+                            <div class="character-icon">🔮</div>
+                            <h3 class="character-name">Necromancer</h3>
+                            <p class="character-desc">Summons undead minions and curses enemies.</p>
+                            <div><strong>Special:</strong> Raise Dead 💀</div>
+                            <div><strong>Defense:</strong> Soul Shield 👻</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="action-btn" style="width: 200px;">Begin Adventure</button>
+                    </div>
+                </div>
+                
+                <!-- Shop Content -->
+                <div id="shopContent" class="content-section" style="display: none;">
+                    <h2 class="section-title"><i class="fas fa-shopping-cart"></i> Item Shop</h2>
+                    <p>Purchase powerful items and potions to aid you in battle!</p>
+                    
+                    <div class="shop-items">
+                        <div class="shop-item">
+                            <div class="item-icon">❤️</div>
+                            <h3>Health Potion</h3>
+                            <p>Restores 30 HP during battle</p>
+                            <div style="margin-top: 15px;">
+                                <i class="fas fa-coins" style="color: #f9ca24;"></i> 50 Coins
+                            </div>
+                            <button class="action-btn" style="margin-top: 10px;">Buy</button>
+                        </div>
+                        
+                        <div class="shop-item">
+                            <div class="item-icon">⚡</div>
+                            <h3>Energy Elixir</h3>
+                            <p>Restores 1 energy point</p>
+                            <div style="margin-top: 15px;">
+                                <i class="fas fa-gem" style="color: #2ecc71;"></i> 2 Diamonds
+                            </div>
+                            <button class="action-btn" style="margin-top: 10px;">Buy</button>
+                        </div>
+                        
+                        <div class="shop-item">
+                            <div class="item-icon">🔥</div>
+                            <h3>Fire Scroll</h3>
+                            <p>Deals 25 fire damage to all enemies</p>
+                            <div style="margin-top: 15px;">
+                                <i class="fas fa-coins" style="color: #f9ca24;"></i> 120 Coins
+                            </div>
+                            <button class="action-btn" style="margin-top: 10px;">Buy</button>
+                        </div>
+                        
+                        <div class="shop-item">
+                            <div class="item-icon">🛡️</div>
+                            <h3>Legendary Shield</h3>
+                            <p>Permanently increases defense by 15%</p>
+                            <div style="margin-top: 15px;">
+                                <i class="fas fa-gem" style="color: #2ecc71;"></i> 50 Diamonds
+                            </div>
+                            <button class="action-btn" style="margin-top: 10px;">Buy</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upgrades Content -->
+                <div id="upgradesContent" class="content-section" style="display: none;">
+                    <h2 class="section-title"><i class="fas fa-level-up-alt"></i> Upgrade Station</h2>
+                    <p>Enhance your abilities and equipment!</p>
+                    
+                    <div class="upgrade-options">
+                        <div class="upgrade-card">
+                            <h3><i class="fas fa-fist-raised"></i> Attack Upgrade</h3>
+                            <p>Increase damage by 10%</p>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 60%;"></div>
+                            </div>
+                            <p>Level 6/10</p>
+                            <button class="action-btn" style="margin-top: 15px;">Upgrade (200 Coins)</button>
+                        </div>
+                        
+                        <div class="upgrade-card">
+                            <h3><i class="fas fa-shield-alt"></i> Defense Upgrade</h3>
+                            <p>Reduce damage taken by 8%</p>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 40%;"></div>
+                            </div>
+                            <p>Level 4/10</p>
+                            <button class="action-btn" style="margin-top: 15px;">Upgrade (180 Coins)</button>
+                        </div>
+                        
+                        <div class="upgrade-card">
+                            <h3><i class="fas fa-briefcase"></i> Bag Capacity</h3>
+                            <p>Carry more items into battle</p>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 75%;"></div>
+                            </div>
+                            <p>Level 3/5 (6 items)</p>
+                            <button class="action-btn" style="margin-top: 15px;">Upgrade (300 Coins)</button>
+                        </div>
+                        
+                        <div class="upgrade-card">
+                            <h3><i class="fas fa-bolt"></i> Special Move</h3>
+                            <p>Enhance your special ability</p>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 30%;"></div>
+                            </div>
+                            <p>Level 3/8</p>
+                            <button class="action-btn" style="margin-top: 15px;">Upgrade (250 Coins)</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Content -->
+                <div id="profileContent" class="content-section" style="display: none;">
+                    <h2 class="section-title"><i class="fas fa-id-card"></i> Your Profile</h2>
+                    
+                    <div class="profile-container">
+                        <div class="profile-info">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <div style="font-size: 4rem;">🧙‍♂️</div>
+                                <h2>Arcane Mage</h2>
+                                <p>Level 7 Hero</p>
+                            </div>
+                            
+                            <div class="profile-stats">
+                                <div class="stat-card">
+                                    <h3>Battles</h3>
+                                    <p style="font-size: 2rem;">42</p>
+                                </div>
+                                <div class="stat-card">
+                                    <h3>Wins</h3>
+                                    <p style="font-size: 2rem;">28</p>
+                                </div>
+                                <div class="stat-card">
+                                    <h3>Win Rate</h3>
+                                    <p style="font-size: 2rem;">67%</p>
+                                </div>
+                                <div class="stat-card">
+                                    <h3>Current Streak</h3>
+                                    <p style="font-size: 2rem;">5 🔥</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-info">
+                            <h3 style="margin-bottom: 20px;">Achievements</h3>
+                            <div style="background: rgba(30, 40, 60, 0.5); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                                <h4>Dragon Slayer 🐉</h4>
+                                <p>Defeated 5 dragons in story mode</p>
+                            </div>
+                            <div style="background: rgba(30, 40, 60, 0.5); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                                <h4>PvP Champion ⚔️</h4>
+                                <p>Won 10 player vs player battles</p>
+                            </div>
+                            <div style="background: rgba(30, 40, 60, 0.5); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                                <h4>Legendary Collector 🏆</h4>
+                                <p>Collected 3 legendary items</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Leaderboard Content -->
+                <div id="leaderboardContent" class="content-section" style="display: none;">
+                    <h2 class="section-title"><i class="fas fa-trophy"></i> Leaderboard</h2>
+                    
+                    <div class="leaderboard">
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">1</div>
+                            <div style="font-size: 2rem;">👑</div>
+                            <div>
+                                <h3>DragonSlayer42</h3>
+                                <p>Level 15 | 2450 Cups</p>
+                            </div>
+                            <div style="margin-left: auto; text-align: right;">
+                                <p><i class="fas fa-coins" style="color: #f9ca24;"></i> 12,450</p>
+                                <p><i class="fas fa-gem" style="color: #2ecc71;"></i> 210</p>
+                            </div>
+                        </div>
+                        
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">2</div>
+                            <div style="font-size: 2rem;">⚔️</div>
+                            <div>
+                                <h3>ShadowKnight</h3>
+                                <p>Level 14 | 2300 Cups</p>
+                            </div>
+                            <div style="margin-left: auto; text-align: right;">
+                                <p><i class="fas fa-coins" style="color: #f9ca24;"></i> 11,200</p>
+                                <p><i class="fas fa-gem" style="color: #2ecc71;"></i> 180</p>
+                            </div>
+                        </div>
+                        
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">3</div>
+                            <div style="font-size: 2rem;">🏹</div>
+                            <div>
+                                <h3>ElvenArcher</h3>
+                                <p>Level 13 | 2150 Cups</p>
+                            </div>
+                            <div style="margin-left: auto; text-align: right;">
+                                <p><i class="fas fa-coins" style="color: #f9ca24;"></i> 9,800</p>
+                                <p><i class="fas fa-gem" style="color: #2ecc71;"></i> 150</p>
+                            </div>
+                        </div>
+                        
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">7</div>
+                            <div style="font-size: 1.5rem;">🧙‍♂️</div>
+                            <div>
+                                <h3>You</h3>
+                                <p>Level 7 | 1250 Cups</p>
+                            </div>
+                            <div style="margin-left: auto; text-align: right;">
+                                <p><i class="fas fa-coins" style="color: #f9ca24;"></i> 1,250</p>
+                                <p><i class="fas fa-gem" style="color: #2ecc71;"></i> 35</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rewards Content -->
+                <div id="rewardsContent" class="content-section" style="display: none;">
+                    <h2 class="section-title"><i class="fas fa-gift"></i> Missions & Rewards</h2>
+                    
+                    <div class="mission-card">
+                        <div class="mission-header">
+                            <h3>Daily Mission: Win 3 Battles</h3>
+                            <div class="mission-timer">4h remaining</div>
+                        </div>
+                        <div class="mission-progress">
+                            <div class="mission-progress-fill" style="width: 66%"></div>
+                        </div>
+                        <p>Progress: 2/3 battles won</p>
+                        <div class="mission-reward">
+                            <div><i class="fas fa-coins" style="color: #f9ca24;"></i> 150 Coins</div>
+                            <div><i class="fas fa-gem" style="color: #2ecc71;"></i> 5 Diamonds</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mission-card">
+                        <div class="mission-header">
+                            <h3>Weekly Mission: Defeat 10 Bosses</h3>
+                            <div class="mission-timer">2d 14h remaining</div>
+                        </div>
+                        <div class="mission-progress">
+                            <div class="mission-progress-fill" style="width: 30%"></div>
+                        </div>
+                        <p>Progress: 3/10 bosses defeated</p>
+                        <div class="mission-reward">
+                            <div><i class="fas fa-coins" style="color: #f9ca24;"></i> 500 Coins</div>
+                            <div><i class="fas fa-gem" style="color: #2ecc71;"></i> 20 Diamonds</div>
+                            <div>Legendary Chest 🏆</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center;">
+                        <h3>Invite Friends & Earn Rewards</h3>
+                        <div style="display: flex; justify-content: center; gap: 30px; margin-top: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem;">👥</div>
+                                <p>Invite 1 friend</p>
+                                <p><i class="fas fa-coins" style="color: #f9ca24;"></i> 100 Coins</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem;">👥👥</div>
+                                <p>Invite 3 friends</p>
+                                <p><i class="fas fa-gem" style="color: #2ecc71;"></i> 10 Diamonds</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem;">👥👥👥</div>
+                                <p>Invite 5 friends</p>
+                                <p>Special Character 🔥</p>
+                            </div>
+                        </div>
+                        <button class="action-btn" style="margin-top: 20px; width: 250px;">Invite Friends</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menu navigation
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.menu-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all content sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Show selected content
+                const sectionId = this.getAttribute('data-section') + 'Content';
+                document.getElementById(sectionId).style.display = 'block';
+            });
+        });
+        
+        // Character selection
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.character-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+        
+        // Battle actions
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const log = document.querySelector('.battle-log');
+                const newEntry = document.createElement('div');
+                
+                if(this.classList.contains('special')) {
+                    newEntry.className = 'log-entry player-log';
+                    newEntry.innerHTML = 'You used <strong>Lightning ⚡</strong>! Enemy took 25 damage.';
+                    
+                    // Update enemy HP
+                    const enemyHpFill = document.querySelector('.enemy .hp-fill');
+                    const currentWidth = parseInt(enemyHpFill.style.width);
+                    enemyHpFill.style.width = (currentWidth - 10) + '%';
+                    document.querySelector('.enemy .hp-text').textContent = 
+                        Math.max(0, Math.floor(120 * (currentWidth - 10) / 100) + '/120';
+                } else {
+                    newEntry.className = 'log-entry player-log';
+                    newEntry.innerHTML = 'You used <strong>' + this.textContent + '</strong>! Enemy took 15 damage.';
+                }
+                
+                log.appendChild(newEntry);
+                log.scrollTop = log.scrollHeight;
+                
+                // Enemy response after delay
+                setTimeout(() => {
+                    const enemyEntry = document.createElement('div');
+                    enemyEntry.className = 'log-entry enemy-log';
+                    const attacks = ['Bite', 'Tail Whip', 'Fire Breath', 'Wing Slap'];
+                    const randomAttack = attacks[Math.floor(Math.random() * attacks.length)];
+                    enemyEntry.innerHTML = 'Enemy used <strong>' + randomAttack + '</strong>! You took 12 damage.';
+                    log.appendChild(enemyEntry);
+                    log.scrollTop = log.scrollHeight;
+                    
+                    // Update player HP
+                    const playerHpFill = document.querySelector('.player .hp-fill');
+                    const currentWidth = parseInt(playerHpFill.style.width);
+                    playerHpFill.style.width = Math.max(0, currentWidth - 8) + '%';
+                    document.querySelector('.player .hp-text').textContent = 
+                        Math.max(0, Math.floor(100 * (currentWidth - 8) / 100) + '/100';
+                }, 1500);
+            });
+        });
+        
+        // Random event
+        function triggerRandomEvent() {
+            const events = [
+                {
+                    emoji: "💰",
+                    title: "Treasure Found!",
+                    desc: "While exploring the Foggy Forest, you stumbled upon a hidden treasure chest!",
+                    reward: "+150 Coins & +10 Diamonds"
+                },
+                {
+                    emoji: "😈",
+                    title: "Bandit Ambush!",
+                    desc: "A group of bandits jumped out from the mist and stole some of your gold!",
+                    reward: "-100 Coins"
+                },
+                {
+                    emoji: "🧪",
+                    title: "Mysterious Potion",
+                    desc: "You found a glowing potion on the path. Drinking it made you feel stronger!",
+                    reward: "+20% Damage for next battle"
+                }
+            ];
+            
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            
+            document.getElementById('eventEmoji').textContent = randomEvent.emoji;
+            document.getElementById('eventTitle').textContent = randomEvent.title;
+            document.getElementById('eventDesc').textContent = randomEvent.desc;
+            document.getElementById('eventReward').textContent = randomEvent.reward;
+            
+            document.getElementById('randomEvent').style.display = 'block';
+        }
+        
+        function closeEvent() {
+            document.getElementById('randomEvent').style.display = 'none';
+        }
+        
+        // Trigger a random event after 5 seconds (for demo)
+        setTimeout(triggerRandomEvent, 5000);
+        
+        // Fog event toggle (for demo)
+        setTimeout(() => {
+            document.getElementById('fogEvent').style.display = 'none';
+        }, 8000);
+    </script>
+</body>
+                                                   </html>
